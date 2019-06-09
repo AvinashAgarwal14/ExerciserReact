@@ -17,13 +17,16 @@ const mcqSelected = (history) => {
     history.push('/new/mcq')
 };
 
-
 const clozeSelected = (history) => {
     history.push('/new/cloze')
 };
 
 const reorderSelected = (history) => {
     history.push('/new/reorder')
+};
+
+const groupSelected = (history) => {
+    history.push('/new/group')
 };
 
 function Template(props) {
@@ -75,6 +78,22 @@ function Template(props) {
                                         <FormattedMessage id={REORDER_TEMPLATE_STRING}/>
                                     </p>
                                     <button className="button-choose" onClick={reorderSelected.bind(null,props.history)}>
+                                        <FormattedMessage id={CHOOSE}/>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-sm-4">
+                            <div className="card">
+                                <div className="card-img-container">
+                                    <div className="card-img-top background-reorder"/>
+                                </div>
+                                <div className="card-body">
+                                    <h5 className="card-title">GROUP ASSIGNEMNT</h5>
+                                    <p className="card-text">
+                                        Drag and place answers in corrext groups.
+                                    </p>
+                                    <button className="button-choose" onClick={groupSelected.bind(null,props.history)}>
                                         <FormattedMessage id={CHOOSE}/>
                                     </button>
                                 </div>

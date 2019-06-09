@@ -46,6 +46,9 @@ class ExerciseList extends Component {
         if (exercise.type === 'REORDER') {
             this.props.history.push('/edit/reorder', {exercise: exercise})
         }
+        if (exercise.type === 'GROUP ASSIGNEMNT') {
+            this.props.history.push('/edit/group', {exercise: exercise})
+        }
     };
 
     onShare = (id, shared) => {
@@ -70,6 +73,9 @@ class ExerciseList extends Component {
         }
         if (exercise.type === 'REORDER') {
             this.props.history.push('/play/reorder', {exercise: exercise})
+        }
+        if (exercise.type === 'GROUP ASSIGNMENT') {
+            this.props.history.push('/play/group', {exercise: exercise})
         }
     };
 

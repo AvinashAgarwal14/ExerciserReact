@@ -6,11 +6,13 @@ import Scores from "./Scores/Scores"
 
 import MCQForm from "./Builders/MCQForm";
 import CLOZEForm from "./Builders/CLOZEForm";
-import REORDERForm from "./Builders/REORDERForm"
+import REORDERForm from "./Builders/REORDERForm";
+import GROUPForm from './Builders/GROUPForm';
 
 import MCQPlay from "./Players/MCQPlayer";
 import CLOZEPlay from "./Players/CLOZEPlayer";
-import REORDERPlay from "./Players/REORDERPlayer"
+import REORDERPlay from "./Players/REORDERPlayer";
+import GROUPPlay from "./Players/GROUPPlayer";
 
 import {injectIntl} from 'react-intl';
 import '../css/index.css';
@@ -43,6 +45,11 @@ const Main = props => {
                 <Route exact path="/new/reorder" render={props=> <REORDERForm {...props}/>} />
                 <Route exact path="/edit/reorder" render={props=> <REORDERForm {...props}/>} />
                 <Route exact path="/play/reorder" render={props=> <REORDERPlay {...props}/>} />
+
+                {/* // GROUP ASSIGNEMNT */}
+                <Route exact path="/new/group" render={props=> <GROUPForm {...props}/>} />
+                <Route exact path="/edit/group" render={props=> <GROUPForm {...props}/>} />
+                <Route exact path="/play/group" render={props=> <GROUPPlay {...props}/>} />
 
                 <Route exact path="/presence/scores" render={props=> <PresenceScores {...props}/>} />
 
