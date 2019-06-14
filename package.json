@@ -9,6 +9,7 @@
     "chart.js": "^2.7.2",
     "copy-webpack-plugin": "^5.0.3",
     "jquery": "^1.9.1",
+    "jsplumb": "^2.10.0",
     "popper.js": "^1.14.3",
     "react": "^16.4.0",
     "react-app-rewired": "^2.1.3",

@@ -90,5 +90,21 @@
     "times": [],
     "shared": false,
     "type": "MCQ"
+  },
+  {
+    "id": 5,
+    "title": "Test",
+    "groups": ["Avinash", "Agarwal"],
+    "questions": [
+      {
+        "id": 1,
+        "question": "What?",
+        "answer": "Avinash"
+      }
+    ],
+    "scores": [],
+    "times": [],
+    "shared": false,
+    "type": "GROUP ASSIGNMENT"
   }
 ]

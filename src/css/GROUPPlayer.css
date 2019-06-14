@@ -58,3 +58,28 @@
     color: #6c757d!important;
     border-color: #6c757d!important;
 }
+
+.group-options{
+    text-align: center;
+    display: inline-block;
+    background-color: white;
+    border: 2px solid #6c757d;
+    height: 250px;
+    position: absolute;
+}
+
+#question{
+    background-color: #808080;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    line-height: 100px;
+}
+
+.before-drag{
+    margin-left: -50px;
+    margin-top: -50px;
+}

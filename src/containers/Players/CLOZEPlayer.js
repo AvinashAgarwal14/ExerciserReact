@@ -185,7 +185,6 @@ class CLOZEPlayer extends Component {
         let buttonText = <FormattedMessage id={SUBMIT_QUESTION}/>;
         if (this.state.submitted) buttonText = <FormattedMessage id={FINISH_EXERCISE}/>
 
-
         let clozetext = this.state.cloze.map((text, i) => {
             // if (text === '</br>') return (<span key={`break${i}`}><br/></span>)
 

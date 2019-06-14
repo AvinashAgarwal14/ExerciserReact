@@ -5,7 +5,8 @@ import {addScoreTime} from '../../store/actions/exercises';
 import "../../css/GROUPPlayer.css"
 import {SUBMIT_QUESTION, NEXT_QUESTION, FINISH_EXERCISE} from "../translation";
 import {FormattedMessage} from 'react-intl';
-
+import {jsPlumb} from 'jsplumb';
+import $ from 'jquery';
 
 class GROUPPlayer extends Component {
 
@@ -27,12 +28,11 @@ class GROUPPlayer extends Component {
             goBackToEdit: false,
             currentScore: 0,
             finish: false,
-
+            groups:[],
             currentQuestion: {
                 id: 1,
                 question: '',
-                answers: [],
-                correctAns: ''
+                answer: '',
             }
         }
     }
@@ -41,7 +41,7 @@ class GROUPPlayer extends Component {
     componentDidMount() {
         if (this.props.location.state) {
             let intervalId = setInterval(this.timer, 1000);
-            const {id, title, questions, scores, times} = this.props.location.state.exercise;
+            const {id, title, questions, scores, times, groups} = this.props.location.state.exercise;
             const currentQuestion = questions[0];
 
             let finish = false;
@@ -49,9 +49,6 @@ class GROUPPlayer extends Component {
 
             let goBackToEdit = false;
             if (this.props.location.state.edit) goBackToEdit = true;
-
-            let answers = currentQuestion.answers;
-            this.shuffleArray(answers);
 
             this.setState({
                 ...this.state,
@@ -64,39 +61,66 @@ class GROUPPlayer extends Component {
                 times: times,
                 finish: finish,
                 goBackToEdit: goBackToEdit,
-                currentQuestion: {
-                    id: currentQuestion.id,
-                    question: currentQuestion.question,
-                    answers: answers,
-                    correctAns: currentQuestion.correctAns
-                }
+                groups:groups,
+                currentQuestion: currentQuestion
             })
         }
+        this.initDragDrop();
     }
+
+    initDragDrop = () => {
+        jsPlumb.ready(() => {
+            var jsPlumbInstance = jsPlumb.getInstance();
+            jsPlumbInstance.draggable("question", { 
+                containment: true,
+                drag: function(e) {
+                    let ques = document.getElementById("question");
+                    ques.classList.remove("before-drag");
+                }
+            });
+        
+            console.log(document.getElementsByClassName("group-options")[0]);
+            console.log(this.refs.group1)
+            
+            // document.addEventListener("DOMContentLoaded", function(event) {
+            //     console.log([...document.getElementsByClassName("group-options")]);
+            // });
+            // let elem = document.getElementsByClassName("group-options");
+            // let groups = Array.from(elem)
+            // console.log(groups);
+
+            // console.log(ReactDOM.findDOMNode(this));
+            // let child = ReactDOM.findDOMNode(this).getElementsByClassName('group-options');
+            // console.log(child.length);
+
+            // console.log(jsPlumbInstance.droppable);
+
+            // let temp=[];
+            // $('.group-options').ready(function(e){
+            //     // console.log(e);
+            //     console.log((document.getElementsByClassName("group-options")).length);
+            //     jsPlumbInstance.droppable('group-options', {
+            //         accept: "question",
+            //         drop: function(e) {
+            //             console.log("Heyyyyy");
+            //             console.log(e);
+            //         }
+            //     });
+            // });
+
+            // let groupps = document.getElementsByClassName("drag-drop")[0].childNodes[0];
+            // console  .log(groupps);
+        });
+    }
+
 
     componentWillUnmount() {
         clearInterval(this.state.intervalID);
     }
 
-    shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]]; // eslint-disable-line no-param-reassign
-        }
-    }
-
-    choiceSelected = choice => {
-        if (!this.state.submitted) {
-            this.setState({
-                selectedAns: choice,
-                selected: true
-            })
-        }
-    };
-
     // to measure time
     timer = () => {
-        this.setState({currentTime: this.state.currentTime + 1});
+        // this.setState({currentTime: this.state.currentTime + 1});
     };
 
     // submit the exercise ( calculate score and time ) show correct/ wrong ans
@@ -109,7 +133,7 @@ class GROUPPlayer extends Component {
             selected: false,
             submitted: true,
             currentScore: score
-        })
+        });
     };
 
     // move to next question
@@ -160,46 +184,70 @@ class GROUPPlayer extends Component {
                 userTime: currentTime,
                 noOfQuestions: noOfQuestions,
                 exercise: exercise,
-                type: "MCQ"
+                type: "GROUP ASSIGNMENT"
             });
         }
     };
 
     render() {
-        const {currentQuestion} = this.state;
+        const {currentQuestion, groups} = this.state;
         const {id} = currentQuestion;
 
-        let choices = currentQuestion.answers.map((ans, i) => {
-            let btn = 'btn-outline-secondary';
-            if (this.state.selectedAns === ans) {
-                btn = 'btn-secondary'
-            }
-            if (this.state.submitted) {
-                if (this.state.selectedAns === this.state.currentQuestion.correctAns) {
-                    if (ans === this.state.selectedAns) {
-                        btn = 'btn-success';
-                    }
-                } else {
-                    if (ans === this.state.currentQuestion.correctAns) {
-                        btn = 'btn-success';
-                    }
-                    if (this.state.selectedAns === ans) {
-                        btn = 'btn-danger';
-                    }
-                }
-            }
-            return (
-                <div className="choices-row" key={`answers-${i}`}>
-                    <div className="col-md-6 choices-div">
-                        <button
-                            className={"btn choices-button " + btn}
-                            id={`answer-${i}`}
-                            onClick={(e) => this.choiceSelected(ans)}
-                        >{ans}</button>
-                    </div>
-                </div>
+        console.log(groups);
+
+        let groupOptions = groups.map((group, index) => {
+            return(
+                <div className = {`group-options col-md-${12/groups.length}`}
+                    id={`group-${index+1}`}
+                    ref={`group${index+1}`}
+                    key={`group-${index+1}`}>
+                    {group}
+                </div> 
             )
         });
+
+ 
+        let question = (
+            <div name={id} id="question"
+                className="before-drag"
+                answer = {currentQuestion.answer}
+                ref="answer"
+                >
+                {currentQuestion.question}
+            </div>
+        )
+
+        // let choices = currentQuestion.answers.map((ans, i) => {
+        //     let btn = 'btn-outline-secondary';
+        //     if (this.state.selectedAns === ans) {
+        //         btn = 'btn-secondary'
+        //     }
+        //     if (this.state.submitted) {
+        //         if (this.state.selectedAns === this.state.currentQuestion.correctAns) {
+        //             if (ans === this.state.selectedAns) {
+        //                 btn = 'btn-success';
+        //             }
+        //         } else {
+        //             if (ans === this.state.currentQuestion.correctAns) {
+        //                 btn = 'btn-success';
+        //             }
+        //             if (this.state.selectedAns === ans) {
+        //                 btn = 'btn-danger';
+        //             }
+        //         }
+        //     }
+        //     return (
+        //         <div className="choices-row" key={`answers-${i}`}>
+        //             <div className="col-md-6 choices-div">
+        //                 <button
+        //                     className={"btn choices-button " + btn}
+        //                     id={`answer-${i}`}
+        //                     onClick={(e) => this.choiceSelected(ans)}
+        //                 >{ans}</button>
+        //             </div>
+        //         </div>
+        //     )
+        // });
 
         let buttonText = <FormattedMessage id={SUBMIT_QUESTION}/>;
         if (this.state.submitted) {
@@ -215,10 +263,11 @@ class GROUPPlayer extends Component {
                             <div className="jumbotron">
                                 <p className="lead">{this.state.title}</p>
                                 <hr className="my-4"/>
-                                <p>{id}. {this.state.currentQuestion.question}</p>
-                            </div>
-                            <div className="row">
-                                {choices}
+                                <div className="drag-drop"
+                                 style={{position:"relative"}}>
+                                    {groupOptions}
+                                    {question}
+                                </div>
                             </div>
                             <div className="d-flex flex-row-reverse">
                                 <div className="justify-content-end">

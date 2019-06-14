@@ -15,7 +15,6 @@ import {
     TITLE_ERROR,
     QUESTION_ERROR,
     ANSWER_ERROR,
-    MCQ
 } from "../translation";
 import {withRouter} from "react-router-dom"
 import "../../css/GROUPForm.css"
@@ -51,7 +50,7 @@ class GROUPForm extends Component {
     // in case of edit load the exercise
     componentDidMount() {
         if (this.props.location.state) {
-            const {id, title, questions, scores, times} = this.props.location.state.exercise;
+            const {id, title, questions, scores, times, groups} = this.props.location.state.exercise;
             const currentQuestion = questions[0];
             this.setState({
                 ...this.state,
@@ -63,6 +62,7 @@ class GROUPForm extends Component {
                 scores: scores,
                 times: times,
                 noOfQuestions: questions.length,
+                groups:groups,
                 currentQuestion: currentQuestion
             });
         }
@@ -296,7 +296,8 @@ class GROUPForm extends Component {
             type: "GROUP ASSIGNMENT",
             questions: this.state.questions,
             scores: this.state.scores,
-            times: this.state.times
+            times: this.state.times,
+            groups: this.state.groups
         };
 
         if (this.state.edit) {

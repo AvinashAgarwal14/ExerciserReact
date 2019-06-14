@@ -46,7 +46,7 @@ class ExerciseList extends Component {
         if (exercise.type === 'REORDER') {
             this.props.history.push('/edit/reorder', {exercise: exercise})
         }
-        if (exercise.type === 'GROUP ASSIGNEMNT') {
+        if (exercise.type === 'GROUP ASSIGNMENT') {
             this.props.history.push('/edit/group', {exercise: exercise})
         }
     };
