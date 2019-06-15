@@ -6,7 +6,6 @@ import "../../css/GROUPPlayer.css"
 import {SUBMIT_QUESTION, NEXT_QUESTION, FINISH_EXERCISE} from "../translation";
 import {FormattedMessage} from 'react-intl';
 import {jsPlumb} from 'jsplumb';
-import $ from 'jquery';
 
 class GROUPPlayer extends Component {
 
@@ -35,6 +34,7 @@ class GROUPPlayer extends Component {
                 answer: '',
             }
         }
+        this.jsPlumbInstance = jsPlumb.getInstance();
     }
 
     // load the exercise from props
@@ -50,6 +50,7 @@ class GROUPPlayer extends Component {
             let goBackToEdit = false;
             if (this.props.location.state.edit) goBackToEdit = true;
 
+
             this.setState({
                 ...this.state,
                 id: id,
@@ -62,56 +63,39 @@ class GROUPPlayer extends Component {
                 finish: finish,
                 goBackToEdit: goBackToEdit,
                 groups:groups,
-                currentQuestion: currentQuestion
+                currentQuestion: currentQuestion,
+            },()=>{
+                this.initDragDrop();
             })
         }
-        this.initDragDrop();
     }
 
     initDragDrop = () => {
-        jsPlumb.ready(() => {
-            var jsPlumbInstance = jsPlumb.getInstance();
-            jsPlumbInstance.draggable("question", { 
-                containment: true,
-                drag: function(e) {
-                    let ques = document.getElementById("question");
-                    ques.classList.remove("before-drag");
-                }
-            });
-        
-            console.log(document.getElementsByClassName("group-options")[0]);
-            console.log(this.refs.group1)
-            
-            // document.addEventListener("DOMContentLoaded", function(event) {
-            //     console.log([...document.getElementsByClassName("group-options")]);
-            // });
-            // let elem = document.getElementsByClassName("group-options");
-            // let groups = Array.from(elem)
-            // console.log(groups);
-
-            // console.log(ReactDOM.findDOMNode(this));
-            // let child = ReactDOM.findDOMNode(this).getElementsByClassName('group-options');
-            // console.log(child.length);
-
-            // console.log(jsPlumbInstance.droppable);
-
-            // let temp=[];
-            // $('.group-options').ready(function(e){
-            //     // console.log(e);
-            //     console.log((document.getElementsByClassName("group-options")).length);
-            //     jsPlumbInstance.droppable('group-options', {
-            //         accept: "question",
-            //         drop: function(e) {
-            //             console.log("Heyyyyy");
-            //             console.log(e);
-            //         }
-            //     });
-            // });
-
-            // let groupps = document.getElementsByClassName("drag-drop")[0].childNodes[0];
-            // console  .log(groupps);
+        this.jsPlumbInstance.draggable("question-drag", { 
+            containment: true,
+            drag: (e) => {
+                let ques = document.getElementById("question-drag");
+                ques.classList.remove("before-drag");
+                this.setState({
+                    ...this.state,
+                    selected: true
+                })
+            }
         });
-    }
+    
+        let groupsDrop = document.getElementsByClassName("group-options");
+        this.jsPlumbInstance.droppable(groupsDrop, {
+            accept: "question",
+            drop: (e) => {
+                let index = e.drop.el.id.split('-')[1];
+                let selectedAns = this.state.groups[index-1];
+                this.setState({
+                    ...this.state,
+                    selectedAns: selectedAns
+                });
+            }
+        });
+    }   
 
 
     componentWillUnmount() {
@@ -120,15 +104,15 @@ class GROUPPlayer extends Component {
 
     // to measure time
     timer = () => {
-        // this.setState({currentTime: this.state.currentTime + 1});
+        this.setState({currentTime: this.state.currentTime + 1});
     };
 
     // submit the exercise ( calculate score and time ) show correct/ wrong ans
     submitQuestion = () => {
         const {currentScore, selectedAns, currentQuestion} = this.state;
-        const {correctAns} = currentQuestion;
+        const {answer} = currentQuestion;
         let score = currentScore;
-        if (selectedAns === correctAns) score = score + 1;
+        if (selectedAns === answer) score = score + 1;
         this.setState({
             selected: false,
             submitted: true,
@@ -144,8 +128,6 @@ class GROUPPlayer extends Component {
             this.finishExercise();
         } else {
             const nextQuestion = questions[nextQuestionNo - 1];
-            let answers = nextQuestion.answers;
-            this.shuffleArray(answers);
             let finish = false;
             if (nextQuestionNo === questions.length) finish = true;
             this.setState({
@@ -158,9 +140,11 @@ class GROUPPlayer extends Component {
                 currentQuestion: {
                     id: nextQuestion.id,
                     question: nextQuestion.question,
-                    answers: answers,
-                    correctAns: nextQuestion.correctAns
+                    answer: nextQuestion.answer,
                 }
+            },()=>{
+                this.jsPlumbInstance.setDraggable("question-drag", true);
+                this.initDragDrop();
             })
         }
 
@@ -193,61 +177,33 @@ class GROUPPlayer extends Component {
         const {currentQuestion, groups} = this.state;
         const {id} = currentQuestion;
 
-        console.log(groups);
-
         let groupOptions = groups.map((group, index) => {
             return(
                 <div className = {`group-options col-md-${12/groups.length}`}
                     id={`group-${index+1}`}
-                    ref={`group${index+1}`}
                     key={`group-${index+1}`}>
                     {group}
                 </div> 
             )
         });
-
  
+        let btnClass;
+        if(this.state.submitted){
+            if(this.state.selectedAns === currentQuestion.answer)
+                btnClass = 'correct-group';
+            else  
+                btnClass = 'wrong-group';
+            this.jsPlumbInstance.setDraggable("question-drag", false);
+        }
+        
         let question = (
-            <div name={id} id="question"
-                className="before-drag"
+            <div name={id} id="question-drag"
+                className={`before-drag ${btnClass}`}
                 answer = {currentQuestion.answer}
-                ref="answer"
                 >
                 {currentQuestion.question}
             </div>
         )
-
-        // let choices = currentQuestion.answers.map((ans, i) => {
-        //     let btn = 'btn-outline-secondary';
-        //     if (this.state.selectedAns === ans) {
-        //         btn = 'btn-secondary'
-        //     }
-        //     if (this.state.submitted) {
-        //         if (this.state.selectedAns === this.state.currentQuestion.correctAns) {
-        //             if (ans === this.state.selectedAns) {
-        //                 btn = 'btn-success';
-        //             }
-        //         } else {
-        //             if (ans === this.state.currentQuestion.correctAns) {
-        //                 btn = 'btn-success';
-        //             }
-        //             if (this.state.selectedAns === ans) {
-        //                 btn = 'btn-danger';
-        //             }
-        //         }
-        //     }
-        //     return (
-        //         <div className="choices-row" key={`answers-${i}`}>
-        //             <div className="col-md-6 choices-div">
-        //                 <button
-        //                     className={"btn choices-button " + btn}
-        //                     id={`answer-${i}`}
-        //                     onClick={(e) => this.choiceSelected(ans)}
-        //                 >{ans}</button>
-        //             </div>
-        //         </div>
-        //     )
-        // });
 
         let buttonText = <FormattedMessage id={SUBMIT_QUESTION}/>;
         if (this.state.submitted) {
@@ -256,7 +212,7 @@ class GROUPPlayer extends Component {
         }
 
         return (
-            <div className="container mcq-container">
+            <div className="container group-container">
                 <div className="row align-items-center justify-content-center">
                     <div className="col-sm-10">
                         <div className="col-md-12">

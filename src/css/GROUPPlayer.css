@@ -1,27 +1,3 @@
-.form-group{
-    /*margin-top: 20px;*/
-}
-
-.choices-div{
-    display: inline-block;
-    width: 100%;
-}
-
-.choices-button{
-    width: 100%;
-}
-
-.choices-div{
-    width: 100%!important;
-    min-width: 350px;
-    display: inline-block!important;
-    margin: 10px;
-}
-
-.choices-row{
-    display: inline-block;
-}
-
 @media (min-width: 576px) {
     .jumbotron {
         padding: 2rem 1rem!important;
@@ -46,17 +22,12 @@
     background-color: #808080!important;
 }
 
-.mcq-container{
+.group-container{
     margin-top: 5%!important;
 }
 
 .lead {
     font-weight: bold !important;
-}
-
-.btn-outline-secondary {
-    color: #6c757d!important;
-    border-color: #6c757d!important;
 }
 
 .group-options{
@@ -68,7 +39,7 @@
     position: absolute;
 }
 
-#question{
+#question-drag{
     background-color: #808080;
     height: 100px;
     width: 100px;
@@ -82,4 +53,12 @@
 .before-drag{
     margin-left: -50px;
     margin-top: -50px;
+}
+
+.correct-group{
+    background-color: green!important;
+}
+
+.wrong-group{
+    background-color: red!important;
 }
